@@ -20,16 +20,28 @@ public class PacienteService {
     public Paciente salvar(Paciente paciente){
 
         boolean existCpf = false;
-        Optional<Paciente> opt_paciente = repository.findByCpf(paciente.getCpf());
+        boolean existEmail = false;
 
-        if (opt_paciente.isPresent()){
-            if (!opt_paciente.get().getId().equals(paciente.getId())){
+        Optional<Paciente> opt_paciente_cpf = repository.findByCpf(paciente.getCpf());
+        if (opt_paciente_cpf.isPresent()) {
+            if (!opt_paciente_cpf.get().getId().equals(paciente.getId())) {
                 existCpf = true;
             }
         }
 
-        if (existCpf){
-            throw new BusinessException("Cpf já cadastrado");
+        Optional<Paciente> opt_paciente_email = repository.findByEmail(paciente.getEmail());
+        if (opt_paciente_email.isPresent()) {
+            if (!opt_paciente_email.get().getId().equals(paciente.getId())) {
+                existEmail = true;
+            }
+        }
+
+        if (existCpf) {
+            throw new BusinessException("CPF já cadastrado");
+        }
+
+        if (existEmail) {
+            throw new BusinessException("E-mail já cadastrado");
         }
 
         return repository.save(paciente);
