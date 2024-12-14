@@ -51,12 +51,12 @@ public class PacienteService {
         return repository.findAll();
     }
 
-   public Optional<Paciente> buscar(Long id){
-        return repository.findById(id);
-   }
+    public Optional<Paciente> buscar(Long id){
+    return repository.findById(id);
+    }
 
-   public void delete(Long id){
-        repository.deleteById(id);
-   }
+    public void delete(Long id){
+    repository.deleteById(id);
+    }
 
 }
