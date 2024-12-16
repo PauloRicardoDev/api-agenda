@@ -1,5 +1,8 @@
 package com.br.paulochagasdev.apiagenda.api.controller;
 
+import com.br.paulochagasdev.apiagenda.api.mapper.PacienteMapper;
+import com.br.paulochagasdev.apiagenda.api.request.PacienteRequest;
+import com.br.paulochagasdev.apiagenda.api.response.PacienteResponse;
 import com.br.paulochagasdev.apiagenda.domain.entity.Paciente;
 import com.br.paulochagasdev.apiagenda.domain.service.PacienteService;
 import lombok.RequiredArgsConstructor;
@@ -18,9 +21,13 @@ public class PacienteController {
     private final PacienteService service;
 
     @PostMapping
-    public ResponseEntity<Paciente> salvar(@RequestBody Paciente dados){
-        Paciente paciente = service.salvar(dados);
-        return ResponseEntity.status(HttpStatus.CREATED).body(paciente);
+    public ResponseEntity<PacienteResponse> salvar(@RequestBody PacienteRequest request){
+
+        Paciente paciente = PacienteMapper.toPaciente(request);
+        Paciente pacienteSalvo = service.salvar(paciente);
+        PacienteResponse pacienteResponse = PacienteMapper.toPacienteResponse(pacienteSalvo);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(pacienteResponse);
     }
 
     @PutMapping("/atualizar")
