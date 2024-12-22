@@ -19,39 +19,44 @@ import java.util.Optional;
 public class PacienteController {
 
     private final PacienteService service;
+    private final PacienteMapper mapper;
 
     @PostMapping
     public ResponseEntity<PacienteResponse> salvar(@RequestBody PacienteRequest request){
 
-        Paciente paciente = PacienteMapper.toPaciente(request);
+        Paciente paciente = mapper.toPaciente(request);
         Paciente pacienteSalvo = service.salvar(paciente);
-        PacienteResponse pacienteResponse = PacienteMapper.toPacienteResponse(pacienteSalvo);
+        PacienteResponse pacienteResponse = mapper.toPacienteResponse(pacienteSalvo);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(pacienteResponse);
     }
 
     @PutMapping("/atualizar")
-    public ResponseEntity<Paciente> alterar(@RequestBody Paciente dados){
-        Paciente paciente = service.salvar(dados);
-        return ResponseEntity.status(HttpStatus.CREATED).body(paciente);
+    public ResponseEntity<PacienteResponse> alterar(@RequestBody PacienteRequest request){
+
+        Paciente paciente = mapper.toPaciente(request);
+        Paciente pacienteSalvo = service.salvar(paciente);
+        PacienteResponse pacienteResponse = mapper.toPacienteResponse(pacienteSalvo);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(pacienteResponse);
     }
 
     @GetMapping("/listar")
-    public ResponseEntity<List<Paciente>> listar(){
+    public ResponseEntity<List<PacienteResponse>> listar(){
         List<Paciente> pacientes = service.listarTodos();
-        return ResponseEntity.status(HttpStatus.OK).body(pacientes);
+        List<PacienteResponse> pacienteResponse = mapper.toPacienteResponseList(pacientes);
+        return ResponseEntity.status(HttpStatus.OK).body(pacienteResponse);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Paciente> buscarPorId(@PathVariable Long id){
+    public ResponseEntity<PacienteResponse> buscarPorId(@PathVariable Long id){
         Optional<Paciente> opt_paciente = service.buscar(id);
+
         if (opt_paciente.isEmpty()){
             return ResponseEntity.noContent().build();
         }
 
-        Paciente paciente = opt_paciente.get();
-
-        return ResponseEntity.status(HttpStatus.OK).body(paciente);
+        return ResponseEntity.status(HttpStatus.OK).body(mapper.toPacienteResponse(opt_paciente.get()));
     }
 
     @DeleteMapping("/{id}")
