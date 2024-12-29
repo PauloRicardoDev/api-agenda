@@ -31,14 +31,14 @@ public class PacienteController {
         return ResponseEntity.status(HttpStatus.CREATED).body(pacienteResponse);
     }
 
-    @PutMapping("/atualizar")
-    public ResponseEntity<PacienteResponse> alterar(@RequestBody PacienteRequest request){
+    @PutMapping("/atualizar/{id}") // Melhorar lógica
+    public ResponseEntity<PacienteResponse> alterar(@PathVariable Long id, @RequestBody PacienteRequest request){
 
         Paciente paciente = mapper.toPaciente(request);
-        Paciente pacienteSalvo = service.salvar(paciente);
+        Paciente pacienteSalvo = service.atualizar(id,paciente);
         PacienteResponse pacienteResponse = mapper.toPacienteResponse(pacienteSalvo);
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(pacienteResponse);
+        return ResponseEntity.status(HttpStatus.OK).body(pacienteResponse);
     }
 
     @GetMapping("/listar")
@@ -59,7 +59,7 @@ public class PacienteController {
         return ResponseEntity.status(HttpStatus.OK).body(mapper.toPacienteResponse(opt_paciente.get()));
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("excluir/{id}")
     public ResponseEntity<Paciente> apagar(@PathVariable Long id){
         service.delete(id);
         return ResponseEntity.noContent().build();

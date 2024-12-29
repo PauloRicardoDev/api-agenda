@@ -47,16 +47,28 @@ public class PacienteService {
         return repository.save(paciente);
     }
 
+    public Paciente atualizar(Long id, Paciente paciente) {
+
+        Optional<Paciente> opt_paciente = buscar(id);
+
+        if (opt_paciente.isEmpty()) {
+            throw new BusinessException("Usuário não encontrado!");
+        }
+
+        paciente.setId(id);
+        return repository.save(paciente);
+    }
+
     public List<Paciente> listarTodos(){
         return repository.findAll();
     }
 
     public Optional<Paciente> buscar(Long id){
-    return repository.findById(id);
+     return repository.findById(id);
     }
 
     public void delete(Long id){
-    repository.deleteById(id);
+        repository.deleteById(id);
     }
 
 }
