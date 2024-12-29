@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 import java.util.Optional;
 
@@ -22,7 +23,7 @@ public class PacienteController {
     private final PacienteMapper mapper;
 
     @PostMapping
-    public ResponseEntity<PacienteResponse> salvar(@RequestBody PacienteRequest request){
+    public ResponseEntity<PacienteResponse> salvar(@Valid  @RequestBody PacienteRequest request){
 
         Paciente paciente = mapper.toPaciente(request);
         Paciente pacienteSalvo = service.salvar(paciente);
@@ -32,7 +33,7 @@ public class PacienteController {
     }
 
     @PutMapping("/atualizar/{id}") // Melhorar lógica
-    public ResponseEntity<PacienteResponse> alterar(@PathVariable Long id, @RequestBody PacienteRequest request){
+    public ResponseEntity<PacienteResponse> alterar(@Valid @PathVariable Long id, @RequestBody PacienteRequest request){
 
         Paciente paciente = mapper.toPaciente(request);
         Paciente pacienteSalvo = service.atualizar(id,paciente);
@@ -48,7 +49,7 @@ public class PacienteController {
         return ResponseEntity.status(HttpStatus.OK).body(pacienteResponse);
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/buscar/{id}")
     public ResponseEntity<PacienteResponse> buscarPorId(@PathVariable Long id){
         Optional<Paciente> opt_paciente = service.buscar(id);
 
