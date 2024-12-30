@@ -49,6 +49,14 @@ public class AgendaService {
     }
 
     public void delete(Long id) {
+
+        Optional<Agenda> opt_agenda = buscar(id);
+
+        if (opt_agenda.isEmpty()) {
+            throw new BusinessException("Item do agendamento não encontrado!");
+        }
+
+
         repository.deleteById(id);
     }
 }

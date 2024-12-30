@@ -4,6 +4,7 @@ import com.br.paulochagasdev.apiagenda.api.mapper.AgendaMapper;
 import com.br.paulochagasdev.apiagenda.api.request.AgendaRequest;
 import com.br.paulochagasdev.apiagenda.api.response.AgendaResponse;
 import com.br.paulochagasdev.apiagenda.domain.entity.Agenda;
+import com.br.paulochagasdev.apiagenda.domain.entity.Paciente;
 import com.br.paulochagasdev.apiagenda.domain.service.AgendaService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -54,4 +55,11 @@ public class AgendaController {
         return ResponseEntity.status(HttpStatus.OK).body(agendaResponse);
 
     }
+
+    @DeleteMapping("excluir/{id}")
+    public ResponseEntity<Agenda> apagar(@PathVariable Long id){
+        service.delete(id);
+        return ResponseEntity.noContent().build();
+    }
+
 }

@@ -68,6 +68,13 @@ public class PacienteService {
     }
 
     public void delete(Long id){
+
+        Optional<Paciente> opt_paciente = buscar(id);
+
+        if (opt_paciente.isEmpty()) {
+            throw new BusinessException("Usuário não encontrado!");
+        }
+
         repository.deleteById(id);
     }
 
