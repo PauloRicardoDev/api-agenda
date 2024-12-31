@@ -32,7 +32,7 @@ public class PacienteController {
         return ResponseEntity.status(HttpStatus.CREATED).body(pacienteResponse);
     }
 
-    @PutMapping("/atualizar/{id}") // Melhorar lógica
+    @PutMapping("/atualizar/{id}")
     public ResponseEntity<PacienteResponse> alterar(@Valid @PathVariable Long id, @RequestBody PacienteRequest request){
 
         Paciente paciente = mapper.toPaciente(request);
