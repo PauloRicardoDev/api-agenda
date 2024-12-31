@@ -1,5 +1,6 @@
 package com.br.paulochagasdev.apiagenda.config;
 
+import com.br.paulochagasdev.apiagenda.domain.service.TokenService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -18,15 +19,11 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @RequiredArgsConstructor
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
-
+    private final CustomAuthorizationFilterConfig securityFilter;
     private final UserDetailsService userDetailsService;
+    private final BCryptPasswordEncoder bCryptPasswordEncoder;
+    private final TokenService tokenService;
 
-    @Bean
-    public BCryptPasswordEncoder bCryptPasswordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
-
-    //Para acessar as requisições sem estar autenticado.
     private static final String[] AUTH_WHITELIST = {
             // -- Swagger UI v2
             "/v2/api-docs",
@@ -43,9 +40,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             "/login"
     };
 
+
     @Override
-    public void configure(AuthenticationManagerBuilder auth) throws Exception {
-       auth.userDetailsService(userDetailsService).passwordEncoder(bCryptPasswordEncoder());
+    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+        auth.userDetailsService(userDetailsService).passwordEncoder(bCryptPasswordEncoder);
     }
 
     @Override
@@ -54,21 +52,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
         http.authorizeRequests().antMatchers(AUTH_WHITELIST).permitAll();
         http.authorizeRequests().anyRequest().authenticated();
-
-        //authenticação
-        http.addFilter(new CustomAuthenticationFilterConfig(authenticationManagerBean()));
-
-        //autorização
-        http.addFilterBefore(new CustomAuthorizationFilterConfig(), UsernamePasswordAuthenticationFilter.class);
-
+        http.addFilter(new CustomAuthenticationFilterConfig(authenticationManagerBean(), tokenService));
+        http.addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class);
     }
-
 
     @Bean
     @Override
     public AuthenticationManager authenticationManagerBean() throws Exception {
         return super.authenticationManagerBean();
     }
-
-
 }

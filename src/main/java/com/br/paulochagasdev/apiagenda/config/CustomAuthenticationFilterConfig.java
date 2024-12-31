@@ -1,7 +1,6 @@
 package com.br.paulochagasdev.apiagenda.config;
 
-import com.auth0.jwt.JWT;
-import com.auth0.jwt.algorithms.Algorithm;
+import com.br.paulochagasdev.apiagenda.domain.service.TokenService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,7 +16,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -28,13 +26,10 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 public class CustomAuthenticationFilterConfig extends UsernamePasswordAuthenticationFilter {
 
     private final AuthenticationManager authenticationManager;
+    private final TokenService tokenService;
 
-    //Responsavel pela autenticação.
     @Override
-    public Authentication attemptAuthentication(
-            HttpServletRequest request,
-            HttpServletResponse response
-    ) throws AuthenticationException {
+    public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
         String usuario = request.getParameter(SPRING_SECURITY_FORM_USERNAME_KEY);
         String senha = request.getParameter(SPRING_SECURITY_FORM_PASSWORD_KEY);
         log.info("Usuario: {}, e senha: {}", usuario, senha);
@@ -42,22 +37,11 @@ public class CustomAuthenticationFilterConfig extends UsernamePasswordAuthentica
         return authenticationManager.authenticate(authenticationToken);
     }
 
-    //retorna o token JWT
     @Override
-    protected void successfulAuthentication(
-            HttpServletRequest request,
-            HttpServletResponse response,
-            FilterChain chain, Authentication authResult
-    ) throws IOException, ServletException {
+    protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication auth) throws IOException, ServletException {
+        User user = (User) auth.getPrincipal();
 
-        Algorithm algorithm = Algorithm.HMAC256("minha-palavra-secreta");
-        User user  = (User) authResult.getPrincipal();
-
-        String accessToken = JWT.create()
-                        .withSubject(user.getUsername())
-                                .withExpiresAt(new Date(System.currentTimeMillis() + 10 * 60 * 1000))
-                                        .withIssuer(request.getRequestURL().toString())
-                                                .sign(algorithm);
+        String accessToken = this.tokenService.generateToken(user);
 
         Map<String, String> token = new HashMap<>();
         token.put("access_token", accessToken);
